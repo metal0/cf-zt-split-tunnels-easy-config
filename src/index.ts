@@ -19,14 +19,15 @@ async function main(): Promise<void> {
 
   // Update our policies
   for(const [_,entry] of policies.entries()) {
-    if(name_filter && name_filter.length >= 2 && entry.name !== name_filter) continue;
+    if(name_filter && name_filter.length >= 2 && (entry.name?.toLowerCase() !== name_filter.toLowerCase() && name_filter.toLowerCase() !== 'default')) continue;
+    if(name_filter?.toLowerCase() === 'default' && !entry.default) continue;
     if(!entry.exclude?.length || !entry.enabled) continue;
     // const def = entry.exclude.filter(e => e.address).map(e => e.address!);
 
     const merged_entries = mergePolicyEntries(entry.exclude, new_routes, to_remove);
     const res = await putDeviceSplitTunnelExcludes(id, entry.default ? null : entry.policy_id, {email, token}, merged_entries);
     if(!res.success) throw new Error(`Error while updating policy [${entry.name}]: \n${JSON.stringify(res.errors, null, 2)}`);
-    console.info(`Updated policy [${entry.name}] successfully!`);
+    console.info(`Updated policy [${entry.name ?? 'Default'}] successfully!`);
   }
 
 }
