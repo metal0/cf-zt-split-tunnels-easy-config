@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "es2022",
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "target": "es2022",
+    "lib": ["esnext"],
+    "baseUrl": ".",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "outDir": "./dist",
+    "paths": {
+      "@shared/*": ["../shared/src/*"]
+    },
+    "sourceMap": false,
+    "alwaysStrict": true,
+    "noImplicitThis": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "useUnknownInCatchVariables": false,
+    "allowJs": true
+  },
+  "include": ["src/**/*.ts"]
+}

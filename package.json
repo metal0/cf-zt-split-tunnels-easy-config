@@ -1,0 +1,25 @@
+{
+  "name": "cf-zt-split-tunnels-easy-config",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "repository": "https://github.com/metal0/cf-zt-split-tunnels-easy-config",
+  "author": "Tiago R <metal@i0.tf>",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "cidr-calc": "^1.0.3",
+    "dotenv": "^16.3.1",
+    "ip-cidr": "^3.1.0",
+    "node-fetch": "^3.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^10.12.19",
+    "@types/node-fetch": "^2.6.4",
+    "typescript": "^4.7.4"
+  },
+  "scripts": {
+    "build": "rm -rf dist/ && tsc",
+    "start": "node dist/index.js",
+    "watch": "tsc -w"
+  }
+}
