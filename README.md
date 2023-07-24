@@ -13,6 +13,11 @@ This means that, unless you manually maintain the CIDRs of the entire public IP 
 Not only are CIDR blocks of the public IP space harder to find and maintain than private IP space, but this also makes the "Domain" selector virtually useless (if you were to add the entire public IP space).
 In the case that you want to exclude a specific domain/IP from tunneling, you run into the same issue.
 
+## Why not just use some weird obscure private IP space that doesn't obstruct anything else?
+
+For my personal use-case, where I selfhost a lot of resources on local devices, it makes it significantly easier to screw up my local network access if I just split tunnel large CIDR blocks such as `192.168.0.0/16`.
+While this is normally viable (and especially for folks with proper vnet setups and a proper private ip range for remote resources), I'd rather have only the very specific CIDRs I actually need tunneled.
+
 ## How does this work?
 
 You simply input the CIDR blocks of IPs that you want to tunnel through WARP into the app, and it will automatically split the default private IP space IPs assigned on the split tunnel configurations into several smaller blocks, which only exclude the blocks you specified.
@@ -44,7 +49,6 @@ This will generate:
 
 ## Okay cool, but why bother, you can easily do this manually.
 Because Cloudflare doesn't provide a super easy way to replicate split tunnel configurations across different device profiles, and I personally need at least 5-6 profiles for my use-case, each of them with different routes available.
-
 
 
 # How to use it?
