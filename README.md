@@ -1,1 +1,66 @@
-# cf-zt-split-tunnels-easy-config
+# Cloudflare ZeroTrust Gateway Split Tunnel Configuration Tool
+(that's a long description lol)
+
+## What it does
+
+This tool simply facilitates configuration of Split Tunnels on exclude mode for the Cloudflare ZeroTrust Gateway WARP VPN client.
+Essentially, it turns "exclude" mode into "include" mode, but while combining the benefits of both modes.
+
+## Why not just use cloudflare's native include mode?
+
+The native include mode works fine, however it excludes **everything** by default, including the entire public IP space (which is not obvious at first).
+This means that, unless you manually maintain the CIDRs of the entire public IP space, WARP won't be used at all other than for VPN purposes.
+Not only are CIDR blocks of the public IP space harder to find and maintain than private IP space, but this also makes the "Domain" selector virtually useless (if you were to add the entire public IP space).
+In the case that you want to exclude a specific domain/IP from tunneling, you run into the same issue.
+
+## How does this work?
+
+You simply input the CIDR blocks of IPs that you want to tunnel through WARP into the app, and it will automatically split the default private IP space IPs assigned on the split tunnel configurations into several smaller blocks, which only exclude the blocks you specified.
+### Example
+```EXEMPTED_ROUTES=192.168.0.100/32```
+
+This will generate:
+```
+192.168.0.0/26
+192.168.0.64/27
+192.168.0.96/30
+192.168.0.101/32
+192.168.0.102/31
+192.168.0.104/29
+192.168.0.112/28
+192.168.0.128/25
+```
+(and will also delete the default `192.168.0.0/16` block)
+
+
+
+## Okay cool, but why bother, you can easily do this manually.
+Because Cloudflare doesn't provide a super easy way to replicate split tunnel configurations across different device profiles, and I personally need at least 5-6 profiles for my use-case, each of them with different routes available.
+
+
+
+# How to use it?
+
+```bash
+git clone https://github.com/metal0/cf-zt-split-tunnels-easy-config.git
+
+# Copy .env.example to .env and fill out the values
+
+# CF_API_TOKEN - Your cloudflare account token. 
+# https://dash.cloudflare.com/profile/api-tokens
+# > this script will NOT accept Bearer Tokens currently. (I'm lazy, sorry)
+
+# CF_API_EMAIL - Your cloudflare account email
+
+# CF_ACCOUNT_ID
+
+# EXEMPTED_ROUTES - The routes that you want to allow tunneling for.
+# > Please keep in mind to write them down in a ascending order.
+
+# FILTER - Name filter for Device Profiles, i.e. if you only want to apply these to a specific profile, just put the profile's name here.
+yarn install
+
+yarn build
+
+yarn start
+```
