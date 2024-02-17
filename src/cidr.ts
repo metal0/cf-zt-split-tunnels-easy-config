@@ -4,32 +4,44 @@ import { IpAddress, IpRange } from 'cidr-calc';
 import { CloudflareApiSplitTunnelEntry } from './api.js';
 
 
+function atoi(addr: string) { // https://stackoverflow.com/questions/31347696/whats-the-most-performant-way-to-do-simple-ip-address-comparisons
+  const parts = addr.split('.').map(function(str) {
+    return parseInt(str);
+  });
+
+  return (parts[0] ? parts[0] << 24 : 0) +
+         (parts[1] ? parts[1] << 16 : 0) +
+         (parts[2] ? parts[2] << 8  : 0) +
+          parts[3];
+};
+
+function checkIpaddrInRange(ipaddr: string, start: string, end: string) {
+  const num = atoi(ipaddr);
+  return (num >= atoi(start)) && (num <= atoi(end));
+}
+
 function overlapsDefaultIpRange(address: string): boolean {
   if(!IPCIDR.isValidCIDR(address)) return false;
   const cidr_limits = new IPCIDR(address).toObject();
   const overlap = default_excluded_routes.filter(r => {
     const rlm = new IPCIDR(r).toObject();
-    return cidr_limits.start <= rlm.end && rlm.start <= cidr_limits.end // https://stackoverflow.com/a/17206898
+    return checkIpaddrInRange(cidr_limits.start, rlm.start, rlm.end) || checkIpaddrInRange(cidr_limits.end, rlm.start, rlm.end)
   });
-
   return overlap.length > 0;
 }
 
-
 export function rangeCalculation(addresses: string[], existing_subnets: string[] = []): {new_routes: string[], to_remove: string[]} {
   addresses = addresses.filter(ad => IPCIDR.isValidCIDR(ad));
-
   const overlaps: {[key: string]: string[]} = {};
   addresses.forEach(address => {
     const cidr_limits = new IPCIDR(address).toObject();
     existing_subnets.forEach(r => {
       const rlm = new IPCIDR(r).toObject();
-      if(cidr_limits.start <= rlm.end && rlm.start <= cidr_limits.end) { // https://stackoverflow.com/a/17206898
+      if(checkIpaddrInRange(cidr_limits.start, rlm.start, rlm.end) || checkIpaddrInRange(cidr_limits.end, rlm.start, rlm.end)) {
         if(!overlaps[r]) overlaps[r] = [];
         overlaps[r].push(address);
       }
     });
-
   });
 
   const new_routes: string[] = [];
