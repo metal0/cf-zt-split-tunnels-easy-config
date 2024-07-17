@@ -16,7 +16,11 @@ In the case that you want to exclude a specific domain/IP from tunneling, you ru
 ## Why not just use some weird obscure private IP space that doesn't obstruct anything else?
 
 For my personal use-case, where I selfhost a lot of resources on local devices, it makes it significantly easier to screw up my local network access if I just split tunnel large CIDR blocks such as `192.168.0.0/16`.
-While this is normally viable (and especially for folks with proper vnet setups and a proper private ip range for remote resources), I'd rather have only the very specific CIDRs I actually need tunneled.
+While this is normally viable (and especially for folks with proper vnet setups and a proper private ip range for remote resources which don't overlap with other standard residential network IP scapes), I'd rather have only the very specific CIDRs I actually need tunneled.
+
+And also, split tunneling such large CIDRs won't work at all because WARP ignores split tunnel route CIDRs entirely as long as they just so happen to include the gateway IP of the device's ethernet adapter (behavior which is undocumented to my knowledge), so i.e. if your gateway is `192.168.0.1`, the entire block of `192.168.0.0/16` won't be tunneled through warp even if configured as a split tunnel route.
+
+For this reason, to reduce the amount of these "collisions" between all sorts of network configurations, I'd rather have small CIDR blocks for the actual resources I need tunneled.
 
 ## How does this work?
 
@@ -43,12 +47,16 @@ This will generate:
 192.168.64.0/18
 192.168.128.0/17
 ```
-(and will also delete the default `192.168.0.0/16` block)
+(and will also delete the default `192.168.0.0/16` block provided by Cloudflare)
 
 
 
 ## Okay cool, but why bother, you can easily do this manually.
-Because Cloudflare doesn't provide a super easy way to replicate split tunnel configurations across different device profiles, and I personally need at least 5-6 profiles for my use-case, each of them with different routes available.
+Because Cloudflare doesn't provide a super easy way to replicate split tunnel configurations across different device profiles via their dashboard, and I personally need at least 5-6 profiles for my use-case, each of them with different routes available.
+
+Doing this work "by hand" proved far more time-consuming than writing this simple script to do it for me.
+
+
 
 
 # How to use it?
